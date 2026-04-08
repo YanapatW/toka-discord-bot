@@ -79,20 +79,20 @@ model BannedWord {
 
 ### Moderation (`src/commands/moderation/`)
 
-All require `Administrator` permission.
+Permissions use Discord's built-in system via `setDefaultMemberPermissions()`. Discord shows "You don't have permission" automatically if the user lacks the required permission.
 
-| Command | Options | Behavior |
-|---|---|---|
-| `/kick` | `user` (required), `reason` (optional, default "No reason provided") | Kick member, log to mod channel |
-| `/ban` | `user` (required), `reason` (optional) | Ban member, log to mod channel |
-| `/unban` | `user-id` (string, required), `reason` (optional) | Unban by ID, log to mod channel |
-| `/warn` | `user` (required), `reason` (optional) | Add warning to DB, check escalation thresholds, log to mod channel |
-| `/warnings` | `user` (required) | Show warning history (ephemeral). List each warning with reason, moderator, date |
-| `/clearwarnings` | `user` (required) | Delete all warnings for user in guild, log to mod channel |
+| Command | Permission | Options | Behavior |
+|---|---|---|---|
+| `/kick` | `KickMembers` | `user` (required), `reason` (optional, default "No reason provided") | Kick member, log to mod channel |
+| `/ban` | `BanMembers` | `user` (required), `reason` (optional) | Ban member, log to mod channel |
+| `/unban` | `BanMembers` | `user-id` (string, required), `reason` (optional) | Unban by ID, log to mod channel |
+| `/warn` | `ModerateMembers` | `user` (required), `reason` (optional) | Add warning to DB, check escalation thresholds, log to mod channel |
+| `/warnings` | `ModerateMembers` | `user` (required) | Show warning history (ephemeral). List each warning with reason, moderator, date |
+| `/clearwarnings` | `ModerateMembers` | `user` (required) | Delete all warnings for user in guild, log to mod channel |
 
 ### Auto-mod Config (`src/commands/admin/`)
 
-All require `Administrator` permission.
+All require `Administrator` permission via `setDefaultMemberPermissions()`.
 
 | Command | Options | Behavior |
 |---|---|---|
