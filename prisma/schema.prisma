@@ -1,0 +1,29 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model ChannelRestriction {
+  id        Int      @id @default(autoincrement())
+  guildId   String   @map("guild_id")
+  command   String
+  channelId String   @map("channel_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@unique([guildId, command, channelId])
+  @@map("channel_restrictions")
+}
+
+model ConversationHistory {
+  id        Int      @id @default(autoincrement())
+  userId    String   @map("user_id")
+  guildId   String   @map("guild_id")
+  role      String
+  content   String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("conversation_history")
+}
