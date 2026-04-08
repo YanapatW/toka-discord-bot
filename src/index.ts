@@ -5,7 +5,11 @@ import { loadEvents } from "./handlers/eventHandler.js";
 import { ExtendedClient } from "./types/index.js";
 
 const client = new Client({
-  intents: [GatewayIntentBits.Guilds],
+  intents: [
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.MessageContent,
+  ],
 }) as ExtendedClient;
 
 client.commands = new Collection();

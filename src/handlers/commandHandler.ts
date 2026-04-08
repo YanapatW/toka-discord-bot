@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import { pathToFileURL } from "node:url";
 import { Collection, REST, Routes } from "discord.js";
 import { config } from "../config.js";
 import { Command, ExtendedClient } from "../types/index.js";
@@ -21,7 +22,7 @@ export async function loadCommands(client: ExtendedClient): Promise<void> {
 
     for (const file of commandFiles) {
       const filePath = path.join(folderPath, file);
-      const commandModule = await import(filePath);
+      const commandModule = await import(pathToFileURL(filePath).href);
       const command: Command = commandModule.default ?? commandModule;
 
       if ("data" in command && "execute" in command) {

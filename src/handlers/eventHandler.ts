@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import { pathToFileURL } from "node:url";
 import { ExtendedClient, Event } from "../types/index.js";
 
 export async function loadEvents(client: ExtendedClient): Promise<void> {
@@ -10,7 +11,7 @@ export async function loadEvents(client: ExtendedClient): Promise<void> {
 
   for (const file of eventFiles) {
     const filePath = path.join(eventsPath, file);
-    const eventModule = await import(filePath);
+    const eventModule = await import(pathToFileURL(filePath).href);
     const event: Event = eventModule.default ?? eventModule;
 
     if (event.once) {
