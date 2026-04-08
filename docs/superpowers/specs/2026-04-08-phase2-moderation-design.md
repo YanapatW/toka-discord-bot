@@ -75,13 +75,50 @@ model BannedWord {
 }
 ```
 
+## Role-Based Command Permissions
+
+Moderation commands support per-server custom role overrides. By default, Discord's built-in permissions apply. Admins can override with `/setrole` to restrict commands to specific roles.
+
+**Flow:**
+1. Default: Discord built-in permission (e.g., `/kick` requires `KickMembers`)
+2. Admin runs `/setrole command:kick role:@Moderator` — now only `@Moderator` can use `/kick`, overriding Discord permissions
+3. Admin runs `/removerole command:kick role:@Moderator` — if no roles left, falls back to Discord built-in permission
+
+**Enforcement:** Checked in `interactionCreate.ts` alongside channel restrictions. If custom roles exist for this command in this guild, the user must have at least one of them. If no custom roles are configured, Discord's default permission check applies.
+
+**Scope:** Only moderation commands (kick, ban, unban, warn, warnings, clearwarnings). Admin commands (automod, warnconfig, log channels) always require `Administrator`.
+
+### CommandRole table
+
+```prisma
+model CommandRole {
+  id      Int    @id @default(autoincrement())
+  guildId String @map("guild_id")
+  command String
+  roleId  String @map("role_id")
+
+  @@unique([guildId, command, roleId])
+  @@map("command_roles")
+}
+```
+
+### Role config commands (`src/commands/admin/`)
+
+Requires `Administrator` permission.
+
+| Command | Options | Behavior |
+|---|---|---|
+| `/setrole` | `command` (choice: kick, ban, unban, warn, warnings, clearwarnings), `role` (role) | Add a role that can use this command |
+| `/removerole` | `command` (choice), `role` (role) | Remove a role from this command |
+| `/listroles` | `command` (choice, optional) | Show role overrides for a command or all commands (ephemeral) |
+
 ## Commands
 
 ### Moderation (`src/commands/moderation/`)
 
-Permissions use Discord's built-in system via `setDefaultMemberPermissions()`. Discord shows "You don't have permission" automatically if the user lacks the required permission.
+Default permissions use Discord's built-in system via `setDefaultMemberPermissions()`. Custom role overrides (if configured) are checked in `interactionCreate.ts`.
 
-| Command | Permission | Options | Behavior |
+| Command | Default Permission | Options | Behavior |
 |---|---|---|---|
 | `/kick` | `KickMembers` | `user` (required), `reason` (optional, default "No reason provided") | Kick member, log to mod channel |
 | `/ban` | `BanMembers` | `user` (required), `reason` (optional) | Ban member, log to mod channel |
@@ -148,6 +185,11 @@ Banned words CRUD:
 - `removeBannedWord(guildId, word)` — remove
 - `getBannedWords(guildId)` — list all
 
+Command role CRUD:
+- `addCommandRole(guildId, command, roleId)` — add role override
+- `removeCommandRole(guildId, command, roleId)` — remove role override
+- `getCommandRoles(guildId, command)` — list roles for a command
+
 ### `src/services/modlog.ts`
 
 Logging helper:
@@ -213,6 +255,9 @@ src/commands/
     warnconfig.ts       (subcommands: set, status, mute-duration)
     setlogchannel.ts
     removelogchannel.ts
+    setrole.ts
+    removerole.ts
+    listroles.ts
     setchannel.ts       (existing)
     removechannel.ts    (existing)
     listchannels.ts     (existing)
