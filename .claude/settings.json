@@ -1,0 +1,36 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pnpm:*)",
+      "Bash(git:*)",
+      "Bash(ls:*)",
+      "Bash(mkdir:*)",
+      "Bash(node:*)",
+      "Bash(npx:*)",
+      "Bash(docker:*)",
+      "Bash(docker-compose:*)",
+      "Read",
+      "Glob",
+      "Grep"
+    ],
+    "deny": [
+      "Bash(rm -rf /)",
+      "Bash(rm -rf ~)"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "pnpm exec tsc --noEmit --pretty 2>&1 | head -20 || true",
+            "timeout": 30,
+            "statusMessage": "Type-checking..."
+          }
+        ]
+      }
+    ]
+  }
+}

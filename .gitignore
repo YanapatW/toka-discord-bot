@@ -28,5 +28,6 @@ data/
 # Logs
 *.log
 npm-debug.log*
-.claude
+# Claude Code (personal config only)
+.claude/settings.local.json
 
