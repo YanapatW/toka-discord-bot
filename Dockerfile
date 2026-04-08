@@ -29,7 +29,7 @@ COPY package.json pnpm-lock.yaml ./
 COPY prisma ./prisma/
 COPY prisma.config.ts ./
 
-RUN pnpm install --frozen-lockfile --prod
+RUN pnpm install --frozen-lockfile
 RUN pnpm exec prisma generate
 
 COPY --from=builder /app/dist ./dist/
