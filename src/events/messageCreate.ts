@@ -25,7 +25,9 @@ const event: Event = {
     if (!content) return;
 
     try {
-      await message.channel.sendTyping();
+      if ("sendTyping" in message.channel) {
+        await message.channel.sendTyping();
+      }
 
       const reply = await chat(
         message.author.id,

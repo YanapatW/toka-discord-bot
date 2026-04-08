@@ -11,7 +11,8 @@ export async function loadEvents(client: ExtendedClient): Promise<void> {
 
   for (const file of eventFiles) {
     const filePath = path.join(eventsPath, file);
-    const eventModule = await import(pathToFileURL(filePath).href);
+    const importPath = process.platform === "win32" ? pathToFileURL(filePath).href : filePath;
+    const eventModule = await import(importPath);
     const event: Event = eventModule.default ?? eventModule;
 
     if (event.once) {

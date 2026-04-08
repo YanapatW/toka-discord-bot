@@ -22,7 +22,8 @@ export async function loadCommands(client: ExtendedClient): Promise<void> {
 
     for (const file of commandFiles) {
       const filePath = path.join(folderPath, file);
-      const commandModule = await import(pathToFileURL(filePath).href);
+      const importPath = process.platform === "win32" ? pathToFileURL(filePath).href : filePath;
+      const commandModule = await import(importPath);
       const command: Command = commandModule.default ?? commandModule;
 
       if ("data" in command && "execute" in command) {
