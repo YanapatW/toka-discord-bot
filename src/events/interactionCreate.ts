@@ -2,10 +2,99 @@ import { Collection, Events, Interaction, MessageFlags } from "discord.js";
 import { Event, ExtendedClient } from "../types/index.js";
 import { getChannelRestrictions } from "../services/settings.js";
 import { getCommandRoles } from "../services/moderation.js";
+import { getPollByMessageId, getPollResults, vote, endPoll } from "../services/poll.js";
+import { buildPollEmbed, buildPollButtons } from "../commands/utility/poll.js";
 
 const event: Event = {
   name: Events.InteractionCreate,
   async execute(interaction: Interaction) {
+    // Button interaction handler
+    if (interaction.isButton()) {
+      const customId = interaction.customId;
+
+      if (customId.startsWith("poll_vote_")) {
+        const parts = customId.split("_");
+        const optionIndex = parseInt(parts[3], 10);
+
+        const poll = await getPollByMessageId(interaction.message.id);
+        if (!poll || !poll.active) {
+          await interaction.reply({
+            content: "This poll has ended.",
+            flags: MessageFlags.Ephemeral,
+          });
+          return;
+        }
+
+        const option = poll.options[optionIndex];
+        if (!option) return;
+
+        await vote(poll.id, interaction.user.id, option.id);
+
+        const updated = await getPollResults(poll.id);
+        if (!updated) return;
+
+        const voteCounts = new Map<number, number>();
+        updated.options.forEach((o, i) => voteCounts.set(i, o._count.votes));
+
+        const embed = buildPollEmbed(
+          updated.question,
+          updated.options.map((o) => o.label),
+          voteCounts,
+          updated._count.votes
+        );
+
+        await interaction.update({
+          embeds: [embed],
+          components: buildPollButtons(
+            updated.id,
+            updated.options.map((o) => o.label),
+            true
+          ),
+        });
+        return;
+      }
+
+      if (customId.startsWith("poll_end_")) {
+        const poll = await getPollByMessageId(interaction.message.id);
+        if (!poll) return;
+
+        if (interaction.user.id !== poll.creatorId) {
+          await interaction.reply({
+            content: "Only the poll creator can end this poll.",
+            flags: MessageFlags.Ephemeral,
+          });
+          return;
+        }
+
+        await endPoll(poll.id);
+
+        const updated = await getPollResults(poll.id);
+        if (!updated) return;
+
+        const voteCounts = new Map<number, number>();
+        updated.options.forEach((o, i) => voteCounts.set(i, o._count.votes));
+
+        const embed = buildPollEmbed(
+          updated.question,
+          updated.options.map((o) => o.label),
+          voteCounts,
+          updated._count.votes
+        ).setFooter({ text: `Poll ended — ${updated._count.votes} total votes` });
+
+        await interaction.update({
+          embeds: [embed],
+          components: buildPollButtons(
+            updated.id,
+            updated.options.map((o) => o.label),
+            false
+          ),
+        });
+        return;
+      }
+
+      return;
+    }
+
     if (!interaction.isChatInputCommand()) return;
 
     const client = interaction.client as ExtendedClient;
