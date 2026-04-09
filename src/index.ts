@@ -21,8 +21,8 @@ async function main(): Promise<void> {
 
   if (!config.discordToken) {
     console.log("DISCORD_TOKEN not set — running in offline mode (no Discord connection)");
-    console.log("Bot is ready but not connected to Discord.");
-    return;
+    console.log("Bot is ready but not connected to Discord. Waiting...");
+    await new Promise(() => {});
   }
 
   await registerCommands(client);
