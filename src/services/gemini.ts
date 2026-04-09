@@ -2,7 +2,9 @@ import { GoogleGenAI, Content } from "@google/genai";
 import { config } from "../config.js";
 import prisma from "./database.js";
 
-const ai = new GoogleGenAI({ apiKey: config.geminiApiKey });
+const ai = config.geminiApiKey
+  ? new GoogleGenAI({ apiKey: config.geminiApiKey })
+  : null;
 
 const SYSTEM_PROMPT =
   "You are ToKa, a helpful and friendly Discord bot assistant. Keep responses concise and under 2000 characters (Discord message limit).";
@@ -31,6 +33,10 @@ export async function chat(
     role: "user",
     parts: [{ text: message }],
   });
+
+  if (!ai) {
+    return "Gemini AI is not configured (GEMINI_API_KEY not set).";
+  }
 
   // Call Gemini
   const response = await ai.models.generateContent({
