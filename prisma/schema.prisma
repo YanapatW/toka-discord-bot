@@ -84,3 +84,66 @@ model CommandRole {
   @@unique([guildId, command, roleId])
   @@map("command_roles")
 }
+
+model Poll {
+  id        Int      @id @default(autoincrement())
+  guildId   String   @map("guild_id")
+  channelId String   @map("channel_id")
+  messageId String   @map("message_id")
+  question  String
+  creatorId String   @map("creator_id")
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  options PollOption[]
+  votes   PollVote[]
+
+  @@map("polls")
+}
+
+model PollOption {
+  id       Int    @id @default(autoincrement())
+  pollId   Int    @map("poll_id")
+  label    String
+  position Int
+
+  poll  Poll       @relation(fields: [pollId], references: [id], onDelete: Cascade)
+  votes PollVote[]
+
+  @@map("poll_options")
+}
+
+model PollVote {
+  id       Int    @id @default(autoincrement())
+  pollId   Int    @map("poll_id")
+  userId   String @map("user_id")
+  optionId Int    @map("option_id")
+
+  poll   Poll       @relation(fields: [pollId], references: [id], onDelete: Cascade)
+  option PollOption @relation(fields: [optionId], references: [id], onDelete: Cascade)
+
+  @@unique([pollId, userId])
+  @@map("poll_votes")
+}
+
+model SelfAssignableRole {
+  id      Int    @id @default(autoincrement())
+  guildId String @map("guild_id")
+  roleId  String @map("role_id")
+
+  @@unique([guildId, roleId])
+  @@map("self_assignable_roles")
+}
+
+model Reminder {
+  id        Int      @id @default(autoincrement())
+  guildId   String   @map("guild_id")
+  channelId String   @map("channel_id")
+  userId    String   @map("user_id")
+  message   String
+  remindAt  DateTime @map("remind_at")
+  fired     Boolean  @default(false)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("reminders")
+}
