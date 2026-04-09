@@ -4,6 +4,7 @@ import { getChannelRestrictions } from "../services/settings.js";
 import { getCommandRoles } from "../services/moderation.js";
 import { getPollByMessageId, getPollResults, vote, endPoll } from "../services/poll.js";
 import { buildPollEmbed, buildPollButtons } from "../commands/utility/poll.js";
+import { buildCategories, buildHelpEmbed, buildHelpButtons } from "../commands/general/help.js";
 
 const event: Event = {
   name: Events.InteractionCreate,
@@ -89,6 +90,23 @@ const event: Event = {
             false
           ),
         });
+        return;
+      }
+
+      if (customId.startsWith("help_prev_") || customId.startsWith("help_next_")) {
+        const client = interaction.client as ExtendedClient;
+        const categories = buildCategories(client);
+        const currentPage = parseInt(customId.split("_")[2], 10);
+        const newPage = customId.startsWith("help_next_")
+          ? currentPage + 1
+          : currentPage - 1;
+
+        if (newPage < 0 || newPage >= categories.length) return;
+
+        const embed = buildHelpEmbed(categories, newPage);
+        const row = buildHelpButtons(newPage, categories.length);
+
+        await interaction.update({ embeds: [embed], components: [row] });
         return;
       }
 
