@@ -8,9 +8,13 @@ function required(name: string): string {
   return value;
 }
 
+function optional(name: string): string {
+  return process.env[name] || "";
+}
+
 export const config = {
-  discordToken: required("DISCORD_TOKEN"),
-  discordClientId: required("DISCORD_CLIENT_ID"),
-  geminiApiKey: required("GEMINI_API_KEY"),
+  discordToken: optional("DISCORD_TOKEN"),
+  discordClientId: optional("DISCORD_CLIENT_ID"),
+  geminiApiKey: optional("GEMINI_API_KEY"),
   databaseUrl: required("DATABASE_URL"),
 };
