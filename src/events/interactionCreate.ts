@@ -1,6 +1,7 @@
 import { Collection, Events, Interaction, MessageFlags } from "discord.js";
 import { Event, ExtendedClient } from "../types/index.js";
 import { getChannelRestrictions } from "../services/settings.js";
+import { getCommandRoles } from "../services/moderation.js";
 
 const event: Event = {
   name: Events.InteractionCreate,
@@ -29,6 +30,32 @@ const event: Event = {
           flags: MessageFlags.Ephemeral,
         });
         return;
+      }
+    }
+
+    // Custom role permission check (moderation commands only)
+    if (interaction.guildId && interaction.member) {
+      const allowedRoles = await getCommandRoles(
+        interaction.guildId,
+        interaction.commandName
+      );
+
+      if (allowedRoles.length > 0) {
+        const memberRoles = Array.isArray(interaction.member.roles)
+          ? interaction.member.roles
+          : [...interaction.member.roles.cache.keys()];
+
+        const hasRole = allowedRoles.some((roleId) =>
+          memberRoles.includes(roleId)
+        );
+
+        if (!hasRole) {
+          await interaction.reply({
+            content: "You don't have permission to use this command.",
+            flags: MessageFlags.Ephemeral,
+          });
+          return;
+        }
       }
     }
 
