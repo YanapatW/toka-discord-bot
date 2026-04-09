@@ -14,14 +14,31 @@ interface HelpCategory {
   commands: { name: string; description: string }[];
 }
 
-const CATEGORY_ORDER = ["General", "AI", "Utility", "Moderation", "Admin"];
+const CATEGORY_ORDER = ["General", "AI Chat", "Moderation", "Auto-mod & Config", "Server Management", "Utility"];
 
 function getCategory(commandName: string): string {
   const map: Record<string, string> = {
     ping: "General",
     help: "General",
-    chat: "AI",
-    reset: "AI",
+    chat: "AI Chat",
+    reset: "AI Chat",
+    kick: "Moderation",
+    ban: "Moderation",
+    unban: "Moderation",
+    warn: "Moderation",
+    warnings: "Moderation",
+    clearwarnings: "Moderation",
+    automod: "Auto-mod & Config",
+    bannedwords: "Auto-mod & Config",
+    warnconfig: "Auto-mod & Config",
+    setrole: "Auto-mod & Config",
+    removerole: "Auto-mod & Config",
+    listroles: "Auto-mod & Config",
+    setchannel: "Server Management",
+    removechannel: "Server Management",
+    listchannels: "Server Management",
+    setlogchannel: "Server Management",
+    removelogchannel: "Server Management",
     poll: "Utility",
     role: "Utility",
     remind: "Utility",
@@ -29,33 +46,17 @@ function getCategory(commandName: string): string {
     cancelreminder: "Utility",
     serverinfo: "Utility",
     userinfo: "Utility",
-    kick: "Moderation",
-    ban: "Moderation",
-    unban: "Moderation",
-    warn: "Moderation",
-    warnings: "Moderation",
-    clearwarnings: "Moderation",
-    setchannel: "Admin",
-    removechannel: "Admin",
-    listchannels: "Admin",
-    setlogchannel: "Admin",
-    removelogchannel: "Admin",
-    setrole: "Admin",
-    removerole: "Admin",
-    listroles: "Admin",
-    automod: "Admin",
-    bannedwords: "Admin",
-    warnconfig: "Admin",
   };
   return map[commandName] ?? "Other";
 }
 
 const CATEGORY_EMOJI: Record<string, string> = {
   General: "🏠",
-  AI: "🤖",
-  Utility: "🔧",
+  "AI Chat": "🤖",
   Moderation: "🛡️",
-  Admin: "⚙️",
+  "Auto-mod & Config": "⚙️",
+  "Server Management": "🔧",
+  Utility: "🧰",
   Other: "📦",
 };
 
