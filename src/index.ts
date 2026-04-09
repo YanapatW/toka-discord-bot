@@ -3,6 +3,7 @@ import { config } from "./config.js";
 import { loadCommands, registerCommands } from "./handlers/commandHandler.js";
 import { loadEvents } from "./handlers/eventHandler.js";
 import { ExtendedClient } from "./types/index.js";
+import { getDueReminders, markFired } from "./services/reminder.js";
 
 const client = new Client({
   intents: [
@@ -27,6 +28,28 @@ async function main(): Promise<void> {
 
   await registerCommands(client);
   await client.login(config.discordToken);
+
+  // Reminder scheduler — check every 30 seconds
+  setInterval(async () => {
+    try {
+      const due = await getDueReminders();
+      for (const reminder of due) {
+        try {
+          const channel = await client.channels.fetch(reminder.channelId);
+          if (channel?.isTextBased() && "send" in channel) {
+            await channel.send(
+              `<@${reminder.userId}> Reminder: ${reminder.message}`
+            );
+          }
+        } catch (error) {
+          console.error(`Reminder ${reminder.id} failed:`, error);
+        }
+        await markFired(reminder.id);
+      }
+    } catch (error) {
+      console.error("Reminder scheduler error:", error);
+    }
+  }, 30_000);
 }
 
 main().catch((error) => {
