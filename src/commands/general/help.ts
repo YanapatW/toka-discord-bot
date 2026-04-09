@@ -14,7 +14,7 @@ interface HelpCategory {
   commands: { name: string; description: string }[];
 }
 
-const CATEGORY_ORDER = ["General", "AI Chat", "Moderation", "Auto-mod & Config", "Server Management", "Utility"];
+const CATEGORY_ORDER = ["General", "AI Chat", "Moderation", "Auto-mod & Config", "Server Management", "Utility", "Fun", "Economy"];
 
 function getCategory(commandName: string): string {
   const map: Record<string, string> = {
@@ -46,6 +46,25 @@ function getCategory(commandName: string): string {
     cancelreminder: "Utility",
     serverinfo: "Utility",
     userinfo: "Utility",
+    coinflip: "Fun",
+    dice: "Fun",
+    rps: "Fun",
+    "8ball": "Fun",
+    trivia: "Fun",
+    "trivia-custom": "Fun",
+    "trivia-add": "Fun",
+    meme: "Fun",
+    "meme-create": "Fun",
+    daily: "Economy",
+    balance: "Economy",
+    give: "Economy",
+    leaderboard: "Economy",
+    work: "Economy",
+    steal: "Economy",
+    slots: "Economy",
+    blackjack: "Economy",
+    shop: "Economy",
+    inventory: "Economy",
   };
   return map[commandName] ?? "Other";
 }
@@ -57,6 +76,8 @@ const CATEGORY_EMOJI: Record<string, string> = {
   "Auto-mod & Config": "⚙️",
   "Server Management": "🔧",
   Utility: "🧰",
+  Fun: "🎮",
+  Economy: "💰",
   Other: "📦",
 };
 

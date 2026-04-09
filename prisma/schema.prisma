@@ -147,3 +147,47 @@ model Reminder {
 
   @@map("reminders")
 }
+
+model UserEconomy {
+  id        Int       @id @default(autoincrement())
+  guildId   String    @map("guild_id")
+  userId    String    @map("user_id")
+  balance   Int       @default(0)
+  lastDaily DateTime? @map("last_daily")
+  lastWork  DateTime? @map("last_work")
+  lastSteal DateTime? @map("last_steal")
+
+  @@unique([guildId, userId])
+  @@map("user_economy")
+}
+
+model ShopItem {
+  id          Int     @id @default(autoincrement())
+  guildId     String  @map("guild_id")
+  name        String
+  description String
+  price       Int
+  roleId      String? @map("role_id")
+
+  @@map("shop_items")
+}
+
+model UserInventory {
+  id      Int    @id @default(autoincrement())
+  guildId String @map("guild_id")
+  userId  String @map("user_id")
+  itemId  Int    @map("item_id")
+
+  @@map("user_inventory")
+}
+
+model TriviaQuestion {
+  id            Int    @id @default(autoincrement())
+  guildId       String @map("guild_id")
+  question      String
+  correctAnswer String @map("correct_answer")
+  wrongAnswers  String @map("wrong_answers")
+  creatorId     String @map("creator_id")
+
+  @@map("trivia_questions")
+}
