@@ -27,3 +27,60 @@ model ConversationHistory {
 
   @@map("conversation_history")
 }
+
+model GuildConfig {
+  id        Int     @id @default(autoincrement())
+  guildId   String  @unique @map("guild_id")
+
+  modLogChannelId     String? @map("mod_log_channel_id")
+  automodLogChannelId String? @map("automod_log_channel_id")
+
+  automodBannedWords   Boolean @default(false) @map("automod_banned_words")
+  automodSpam          Boolean @default(false) @map("automod_spam")
+  automodLinks         Boolean @default(false) @map("automod_links")
+  automodMassMentions  Boolean @default(false) @map("automod_mass_mentions")
+
+  spamMaxMessages    Int @default(5)  @map("spam_max_messages")
+  spamInterval       Int @default(10) @map("spam_interval")
+  massMentionLimit   Int @default(5)  @map("mass_mention_limit")
+
+  warnMuteThreshold  Int? @map("warn_mute_threshold")
+  warnKickThreshold  Int? @map("warn_kick_threshold")
+  warnBanThreshold   Int? @map("warn_ban_threshold")
+  muteDuration       Int  @default(60) @map("mute_duration")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt      @map("updated_at")
+
+  @@map("guild_config")
+}
+
+model Warning {
+  id          Int      @id @default(autoincrement())
+  guildId     String   @map("guild_id")
+  userId      String   @map("user_id")
+  moderatorId String   @map("moderator_id")
+  reason      String
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@map("warnings")
+}
+
+model BannedWord {
+  id      Int    @id @default(autoincrement())
+  guildId String @map("guild_id")
+  word    String
+
+  @@unique([guildId, word])
+  @@map("banned_words")
+}
+
+model CommandRole {
+  id      Int    @id @default(autoincrement())
+  guildId String @map("guild_id")
+  command String
+  roleId  String @map("role_id")
+
+  @@unique([guildId, command, roleId])
+  @@map("command_roles")
+}
